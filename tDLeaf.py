@@ -1,0 +1,93 @@
+#!/usr/bin/env python
+"""
+train value_network using the TD-Leaf(lambda) reinforcement algorithm
+"""
+from tDLambda import *
+from engine import *
+from node import *
+from play import *
+from value_network import *
+from noughts_crosses import *
+import matplotlib.pyplot as plt
+import csv
+
+
+def get_leaf_pv(node):
+    'get the leaf pv of a node'
+    if node.pv is not None:
+        return get_leaf_pv(node.pv)
+    else:
+        return node.board
+
+
+def TD_Leaf(engines, network, discount):
+    'return sequence of boards and reward for training'
+    trace = create_train_sequence(engines, discount)
+    boards = [get_leaf_pv(t) for t in trace]
+    reward = trace[-1].reward
+    network.temporal_difference(boards, reward, discount)
+
+
+def train(engine, games):
+    'train engine for self play in games'
+    for _ in range(games):
+        TD_Leaf([engine, engine], engine.policy, engine.discount)
+
+
+if __name__ == "__main__":
+    with open("tDLeaf.csv", "wb") as csv_file:
+        writer = csv.writer(csv_file, delimiter=',')
+        
+        plt.ion()
+        batch = 20
+        learningRate = 0.01
+        discount = 0.7
+        directory = "tDLeaf"
+        valueNetwork = ValueNet(learningRate, 0.7)
+        e = Engine(valueNetwork, 3, discount)
+        r = Engine(random, 1, discount)
+        win, lose, draw = [], [], []
+        testGamesNum = 10
+        count = 0
+        while True:
+            # plot first before train
+            w, l, d = 0, 0, 0
+            for _ in range(testGamesNum):
+                score = self_play([e, r])
+                if score == 1:
+                    w += 1
+                elif score == -1:
+                    l += 1
+                else:
+                    d += 1
+                score = self_play([r, e])
+                if score == -1:
+                    w += 1
+                elif score == 1:
+                    l += 1
+                else:
+                    d += 1
+            w = float(w) / (2.0 * testGamesNum)
+            l = float(l) / (2.0 * testGamesNum)
+            d = float(d) / (2.0 * testGamesNum)
+            writer.writerow([w, l, d])
+            print "Wins, Losses, Draws:", w, l, d, e.policy(initialBoard)
+            win.append(w)
+            lose.append(l)
+            draw.append(d)
+            x = range(0, batch*(count + 1), batch)
+            plt.plot(x, win, label="P(win)")
+            plt.plot(x, draw, label="P(draw)")
+            plt.plot(x, lose, label="P(lose)")
+            plt.legend()
+            plt.title("Training vs Time")
+            plt.xlabel('Self-Play Games Played')
+            plt.ylabel('Probability')
+            plt.pause(0.001)
+            plt.clf()
+
+            # train
+            train(e, batch)
+            if (count % 100) == 99:
+                e.policy.save_weights(directory)
+            count += 1
