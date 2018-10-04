@@ -89,7 +89,7 @@ class ValueNet(nn.Module):
     
     def forward(self, inputLayer):
         'forward pass using Variable inputLayer'
-        inputLayer = self.list_to_Variable(inputLayer, False)
+        inputLayer = self.board_to_feature_vector(inputLayer, False)
         return self.forward_pass(inputLayer).data[0]
     
 
@@ -139,3 +139,4 @@ class ValueNet(nn.Module):
 from chess import *
 v = ValueNet(0.5, 0.7)
 v.temporal_difference([Board()], 1.0, 0.7)
+print v.forward(Board()) # confirm that forward pass of chessboard works
