@@ -12,12 +12,14 @@ def self_play(engines):
     board = Board()
     player = board.turn
     index = 0
-    while evaluate(board) is None:
+    moves = 3
+    while (evaluate(board) is None) or (moves == 0):
         board = engines[index].minimax(board, player)
         player = board.turn
         index = int(not index)
         #print(board)
         #pretty_print(board)
+        moves -= 1
     return evaluate(board)
 
 

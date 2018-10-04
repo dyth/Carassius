@@ -29,18 +29,18 @@ class Engine:
     
     def minimax(self, board, player):
         'find self.bestMove using minimax and principal variation'
-        return self.create_search_tree(board, player).pv.board
+        return self.create_search_tree(board).pv.board
     
     
     def maximise(self, node, depth, rootNode):
         'maximise policy score for players[0]'
         if (depth == 0) or (node.reward is not None):
             return self.policy(node.board)
-        moves = board.legal_moves
+        moves = node.board.legal_moves
         score = -2.0
         for m in moves:
-            board.push(m)
-            daughter = Node(board)
+            node.board.push(m)
+            daughter = Node(node.board)
             newScore = self.minimise(daughter, depth-1, False)
             if (newScore > score):
                 if node.pv is not None:
@@ -49,7 +49,7 @@ class Engine:
                 node.pv = daughter
             else:
                 node.other.append(daughter)
-            board.pop()
+            node.board.pop()
         return self.discount * score
     
     
@@ -57,11 +57,11 @@ class Engine:
         'minimise policy score for players[1]'
         if (depth == 0) or (node.reward is not None):
             return self.policy(node.board)
-        moves = board.legal_moves
+        moves = node.board.legal_moves
         score = 2.0
         for m in moves:
-            board.push(m)
-            daughter = Node(m)
+            node.board.push(m)
+            daughter = Node(node.board)
             newScore = self.maximise(daughter, depth-1, False)
             if (newScore < score):
                 if node.pv is not None:
@@ -70,7 +70,7 @@ class Engine:
                 node.pv = daughter
             else:
                 node.other.append(daughter)
-            board.pop()
+            node.board.pop()
         return self.discount * score
 
 

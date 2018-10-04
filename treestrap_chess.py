@@ -39,12 +39,14 @@ def TreeStrap(engines, network, discount):
     board = Board()
     player = players[0]
     index = 0
-    while evaluate(board) is None:
+    moves = 10
+    while (evaluate(board) is None) or (moves == 0):
         node = engines[index].create_search_tree(board, player)
         train_games(network, node, discount)
         board = node.pv.board
         player = next_player(player)
         index = int(not index)
+        moves -= 1
 
 
 def train(engine, games):
@@ -63,7 +65,7 @@ if __name__ == "__main__":
         discount = 0.7
         directory = "treestrap"
         valueNetwork = ValueNet(learningRate, 0.7)
-        e = Engine(valueNetwork, 20, discount)
+        e = Engine(valueNetwork, 1, discount)
         r = Engine(random, 1, discount)
         win, lose, draw = [], [], []
         testGamesNum = 10

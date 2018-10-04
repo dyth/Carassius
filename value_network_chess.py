@@ -135,8 +135,8 @@ class ValueNet(nn.Module):
                 p.data += self.learningRate * t * g
             #print grad[0][0]
 
-
-from chess import *
-v = ValueNet(0.5, 0.7)
-v.temporal_difference([Board()], 1.0, 0.7)
-print v.forward(Board()) # confirm that forward pass of chessboard works
+if __name__ == "__main__":
+    from chess import *
+    v = ValueNet(0.5, 0.7)
+    v.temporal_difference([Board()], 1.0, 0.7)
+    print v.forward(Board()) # confirm that forward pass of chessboard works
