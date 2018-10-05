@@ -39,9 +39,9 @@ def TreeStrap(engines, network, discount):
     board = Board()
     player = players[0]
     index = 0
-    moves = 10
-    while (evaluate(board) is None) or (moves == 0):
-        node = engines[index].create_search_tree(board, player)
+    moves = 100
+    while (evaluate(board) is None) and (moves > 0):
+        node = engines[index].create_search_tree(board)
         train_games(network, node, discount)
         board = node.pv.board
         player = next_player(player)
@@ -73,7 +73,7 @@ if __name__ == "__main__":
         while True:
             # plot first before train
             w, l, d = 0, 0, 0
-            for _ in range(testGamesNum):
+            for i in range(testGamesNum):
                 score = self_play([e, r])
                 if score == 1:
                     w += 1

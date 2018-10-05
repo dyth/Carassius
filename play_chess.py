@@ -12,8 +12,8 @@ def self_play(engines):
     board = Board()
     player = board.turn
     index = 0
-    moves = 3
-    while (evaluate(board) is None) or (moves == 0):
+    moves = 100
+    while (evaluate(board) is None) and (moves > 0):
         board = engines[index].minimax(board, player)
         player = board.turn
         index = int(not index)

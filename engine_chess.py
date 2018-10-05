@@ -34,7 +34,9 @@ class Engine:
     
     def maximise(self, node, depth, rootNode):
         'maximise policy score for players[0]'
+        # print depth
         if (depth == 0) or (node.reward is not None):
+            # print "break"
             return self.policy(node.board)
         moves = node.board.legal_moves
         score = -2.0
@@ -55,7 +57,9 @@ class Engine:
     
     def minimise(self, node, depth, rootNode):
         'minimise policy score for players[1]'
+        # print depth
         if (depth == 0) or (node.reward is not None):
+            # print "break"
             return self.policy(node.board)
         moves = node.board.legal_moves
         score = 2.0
