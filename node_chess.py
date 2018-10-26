@@ -4,6 +4,8 @@ Datastructure for a node in a game tree. Useful in reinforcement learning
 """
 from chess import *
 from copy import deepcopy
+from random import uniform, seed
+seed(9001)
 
 
 def evaluate(board):
@@ -16,7 +18,12 @@ def evaluate(board):
     elif board.is_stalemate():
         return 0
 
-        
+
+def random(board):
+    'policy to select a move at random'
+    return uniform(-1, 1)
+
+
 class Node:
 
     def __init__(self, board):

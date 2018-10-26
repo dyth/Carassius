@@ -27,7 +27,7 @@ class Engine:
         return node
 
     
-    def minimax(self, board, player):
+    def minimax(self, board):
         'find self.bestMove using minimax and principal variation'
         return self.create_search_tree(board).pv.board
     

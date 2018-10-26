@@ -10,12 +10,10 @@ from chess import *
 def self_play(engines):
     'engines is a list of engines and engines[0] moves first'
     board = Board()
-    player = board.turn
     index = 0
     moves = 100
     while (evaluate(board) is None) and (moves > 0):
-        board = engines[index].minimax(board, player)
-        player = board.turn
+        board = engines[index].minimax(board)
         index = int(not index)
         #print(board)
         #pretty_print(board)

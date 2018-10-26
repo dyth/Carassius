@@ -8,6 +8,7 @@ from node_chess import *
 from play_chess import *
 from value_network_chess import *
 from chess import *
+
 import matplotlib.pyplot as plt
 import csv
 
@@ -37,14 +38,12 @@ def train_games(network, node, discount):
 def TreeStrap(engines, network, discount):
     'return sequence of boards and reward for training'
     board = Board()
-    player = players[0]
     index = 0
     moves = 100
     while (evaluate(board) is None) and (moves > 0):
         node = engines[index].create_search_tree(board)
         train_games(network, node, discount)
         board = node.pv.board
-        player = next_player(player)
         index = int(not index)
         moves -= 1
 
