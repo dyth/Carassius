@@ -2,10 +2,10 @@
 """
 train value_network using the TD(lambda) reinforcement algorithm
 """
-from engine_chess import *
-from node_chess import *
-from play_chess import *
-from value_network_chess import *
+from engine import *
+from node import *
+from play import *
+from value_network import *
 from chess import *
 
 import matplotlib.pyplot as plt

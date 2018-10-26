@@ -2,8 +2,8 @@
 """
 play chess against a random agent or human opposition
 """
-from engine_chess import *
-from value_network_chess import *
+from engine import *
+from value_network import *
 from chess import *
 
 

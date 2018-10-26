@@ -3,7 +3,7 @@
 engine utilises a function policy to choose the best move using minimax on chess
 """
 from chess import *
-from node_chess import *
+from node import *
 
 
 class Engine:
