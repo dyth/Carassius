@@ -135,6 +135,7 @@ class ValueNet(nn.Module):
                 p.data += self.learningRate * t * g
             #print grad[0][0]
 
+
 if __name__ == "__main__":
     from chess import *
     v = ValueNet(0.5, 0.7)

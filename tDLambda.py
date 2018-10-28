@@ -40,6 +40,9 @@ def TD_Lambda(engines, network, discount):
     trace = create_train_sequence(engines, discount)
     boards = [t.board for t in trace]
     reward = trace[-1].reward
+    if reward is None:
+        reward = network(boards[-1])
+        boards = boards[:-1]
     network.temporal_difference(boards, reward, discount)
         
 
