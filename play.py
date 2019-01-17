@@ -11,13 +11,13 @@ def self_play(engines):
     'engines is a list of engines and engines[0] moves first'
     board = Board()
     index = 0
-    moves = 100
+    moves = 50
     while (evaluate(board) is None) and (moves > 0):
         board = engines[index].minimax(board)
         index = int(not index)
-        #print(board)
-        #pretty_print(board)
+        # print(board)
         moves -= 1
+        # print(moves)
     return evaluate(board)
 
 
@@ -25,4 +25,3 @@ if __name__ == "__main__":
     e = Engine(optimal, 9, 0.7)
     u = User()
     self_play([e, u])
-    

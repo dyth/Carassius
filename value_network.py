@@ -31,9 +31,11 @@ class ValueNet(nn.Module):
         self.fc3= nn.Linear(32, 1)
 
         # if cuda, use GPU
-        self.gpu = False #torch.cuda.is_available()
+        self.gpu = torch.cuda.is_available()
         if self.gpu:
             self.cuda()
+            if torch.backends.cudnn.is_available():
+                torch.backends.cudnn.benchmark = True
 
 
     def list_to_Variable(self, inputLayer, grad):

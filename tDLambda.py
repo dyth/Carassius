@@ -53,7 +53,7 @@ def train(engine, games):
 
 
 if __name__ == "__main__":
-    with open("tDLambda.csv", "wb") as csv_file:
+    with open("tDLambda.csv", "w") as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
 
         plt.ion()
