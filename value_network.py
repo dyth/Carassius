@@ -24,7 +24,7 @@ class ValueNet(nn.Module):
         self.learningRate = learningRate
         self.weightsNum = 0
         self.decay = decay
-        
+
         # three layers
         self.fc1 = nn.Linear(68, 128)
         self.fc2 = nn.Linear(128, 32)
@@ -35,7 +35,7 @@ class ValueNet(nn.Module):
         if self.gpu:
             self.cuda()
 
-            
+
     def list_to_Variable(self, inputLayer, grad):
         'convert a list to Variable for use in PyTorch'
         inputLayer = [0 if iL == None else iL for iL in inputLayer]
@@ -44,7 +44,7 @@ class ValueNet(nn.Module):
             inputLayer = inputLayer.cuda()
         return Variable(inputLayer, requires_grad=grad)
 
-    
+
     def set_piece_position(self, index, vector, f, r):
         'set normalised file, rank, 8-rank for a piece'
         while vector[index] != -1.0:
@@ -52,8 +52,8 @@ class ValueNet(nn.Module):
             # normalise values
             vector[index] = f / 8.0
             vector[index+1] = r / 8.0
-    
-    
+
+
     def board_to_feature_vector(self, board, grad):
         'full piece promotion'
         # create {piece -> vectorposition} dictionary
@@ -74,7 +74,7 @@ class ValueNet(nn.Module):
         if self.gpu:
             iL = iL.cuda()
         return Variable(iL, requires_grad=grad)
-    
+
 
     def forward_pass(self, out):
         'forward pass using Variable inputLayer'
@@ -85,27 +85,27 @@ class ValueNet(nn.Module):
         out = self.fc3(out)
         #out = F.dropout(out, training=self.training)
         return F.tanh(out)
-    
-    
+
+
     def forward(self, inputLayer):
         'forward pass using Variable inputLayer'
         inputLayer = self.board_to_feature_vector(inputLayer, False)
         return self.forward_pass(inputLayer).data[0]
-    
+
 
     def load_weights(self):
         'load name'
         self.load_state_dict(torch.load("weights.h5"))
-    
-    
+
+
     def save_weights(self, directory):
         'save the weights as the number in "directory/"'
         self.weightsNum += 1
         name = directory + "/" +  str(self.weightsNum) + ".h5"
-        print name
+        print(name)
         torch.save(self.state_dict(), name)
 
-    
+
     def temporal_difference(self, boards, lastValue, discount):
         'backup values according to boards'
         traces, gradients, trace = [], [], 0.0
@@ -140,4 +140,4 @@ if __name__ == "__main__":
     from chess import *
     v = ValueNet(0.5, 0.7)
     v.temporal_difference([Board()], 1.0, 0.7)
-    print v.forward(Board()) # confirm that forward pass of chessboard works
+    print(v.forward(Board())) # confirm that forward pass of chessboard works

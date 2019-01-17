@@ -16,7 +16,7 @@ class Engine:
         self.searchDepth = searchDepth
         self.discount = discount
 
-    
+
     def create_search_tree(self, board):
         'create search tree from board'
         node = Node(board)
@@ -26,12 +26,12 @@ class Engine:
             self.maximise(node, self.searchDepth, True)
         return node
 
-    
+
     def minimax(self, board):
         'find self.bestMove using minimax and principal variation'
         return self.create_search_tree(board).pv.board
-    
-    
+
+
     def maximise(self, node, depth, rootNode):
         'maximise policy score for players[0]'
         # print depth
@@ -53,8 +53,8 @@ class Engine:
                 node.other.append(daughter)
             node.board.pop()
         return self.discount * score
-    
-    
+
+
     def minimise(self, node, depth, rootNode):
         'minimise policy score for players[1]'
         # print depth
@@ -81,4 +81,4 @@ class Engine:
 if __name__ == "__main__":
     e = Engine(evaluate, 9, 0.7)
     tree = e.create_search_tree(Board())
-    print tree.other
+    print(tree.other)

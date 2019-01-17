@@ -19,7 +19,7 @@ def create_train_sequence(engines, discount):
     # to explore, do a randomly chosen first move
     r = Engine(random, 1, discount)
     board = r.minimax(board)
-    
+
     trace = []
     index = 0
     moves = 100
@@ -44,7 +44,7 @@ def TD_Lambda(engines, network, discount):
         reward = network(boards[-1])
         boards = boards[:-1]
     network.temporal_difference(boards, reward, discount)
-        
+
 
 def train(engine, games):
     'train engine for self play in games'
@@ -55,7 +55,7 @@ def train(engine, games):
 if __name__ == "__main__":
     with open("tDLambda.csv", "wb") as csv_file:
         writer = csv.writer(csv_file, delimiter=',')
-        
+
         plt.ion()
         batch = 20
         learningRate = 0.01
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             l = float(l) / (2.0 * testGamesNum)
             d = float(d) / (2.0 * testGamesNum)
             writer.writerow([w, l, d])
-            print "Wins, Losses, Draws:", w, l, d, e.policy(Board())
+            print("Wins, Losses, Draws:", w, l, d, e.policy(Board()))
             win.append(w)
             lose.append(l)
             draw.append(d)
@@ -109,4 +109,3 @@ if __name__ == "__main__":
             if (count % 100) == 99:
                 e.policy.save_weights(directory)
             count += 1
-            
