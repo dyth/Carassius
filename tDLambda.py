@@ -18,7 +18,7 @@ def create_train_sequence(engines, discount):
     'create a forest of nodes, their roots a new board position'
     global games_played
     games_played += 1
-    
+
     board = Board()
     seen_boards = set() # set of all seen boards
     seen_boards.add(board.fen().split(' ')[0])
@@ -42,7 +42,7 @@ def create_train_sequence(engines, discount):
         index = int(not index)
         moves -= 1
     pretty_print(board)
-    print(games_played, moves, evaluate(board))
+    print(games_played, 400-moves, evaluate(board))
 
     node = Node(board)
     node.reward = evaluate(board)

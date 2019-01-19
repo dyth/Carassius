@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import csv
 import os
 import time
+import json
 
 
 def self_play(engines):
@@ -23,7 +24,7 @@ def self_play(engines):
         index = int(not index)
         moves -= 1
     pretty_print(board)
-    print(evaluate(board), moves)
+    print(evaluate(board), 400-moves)
     return evaluate(board)
 
 
@@ -83,8 +84,17 @@ while True:
             win, lose, draw = add_new_values(win, lose, draw, path, name)
             seen.add(name)
             count += 1
-
             games = range(0, batch*count, batch)
+
+            graph_data = {
+                'games': list(games),
+                'win': win,
+                'lose': lose,
+                'draw': draw
+            }
+            with open(f'{path}.json', 'w') as outfile:
+                json.dump(graph_data, outfile)
+
             plt.plot(games, win, label="P(win)")
             plt.plot(games, draw, label="P(draw)")
             plt.plot(games, lose, label="P(lose)")
