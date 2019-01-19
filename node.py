@@ -8,6 +8,22 @@ from random import uniform, seed
 seed(9001)
 
 
+def pretty_print(board):
+    'print chessboard ascii'
+    # get ascii and change numbers into spaces
+    board_string = board.fen().split(' ')[0]
+    for i in range(1, 9):
+        board_string = board_string.replace(str(i), i*' ')
+    pieces = {'R':'♜', 'N':'♞', 'B':'♝', 'Q':'♛', 'K':'♚', 'P':'♟',
+              'r':'♖', 'n':'♘', 'b':'♗', 'q':'♕', 'k':'♔', 'p':'♙'}
+
+    # print ascii board and coordinates
+    print()
+    for i, row in enumerate(board_string.split('/')):
+        print(' ', 8-i, ' '.join(pieces.get(p, p) for p in row))
+    print('    a b c d e f g h \n\n')
+
+
 def evaluate(board):
     'if checkmate, return 1 or -1'
     if board.is_checkmate():

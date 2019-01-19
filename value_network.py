@@ -54,6 +54,7 @@ class ValueNet(nn.Module):
             # normalise values
             vector[index] = f / 8.0
             vector[index+1] = r / 8.0
+        return vector
 
 
     def board_to_feature_vector(self, board, grad):
@@ -71,8 +72,11 @@ class ValueNet(nn.Module):
                 square = board.piece_at((8*f) + r)
                 # if occupied, set places in the vector
                 if square != None:
-                    self.set_piece_position(index[square.symbol()], iL, f, r)
+                    print(square.symbol(), len(iL), index[square.symbol()])
+                    iL = self.set_piece_position(index[square.symbol()], iL, f, r)
+        print(iL)
         iL = torch.FloatTensor(np.array(iL))
+        print(iL)
         if self.gpu:
             iL = iL.cuda()
         return Variable(iL, requires_grad=grad)
@@ -141,5 +145,6 @@ class ValueNet(nn.Module):
 if __name__ == "__main__":
     from chess import *
     v = ValueNet(0.5, 0.7)
-    v.temporal_difference([Board()], 1.0, 0.7)
-    print(v.forward(Board())) # confirm that forward pass of chessboard works
+    # v.temporal_difference([Board()], 1.0, 0.7)
+    # print(v.forward(Board())) # confirm that forward pass of chessboard works
+    v.board_to_feature_vector(Board(), 1)

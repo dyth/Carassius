@@ -4,12 +4,27 @@ train value_network using the TD(lambda) reinforcement algorithm
 """
 from engine import *
 from node import *
-from play import *
+# from play import *
 from value_network import *
 from chess import *
 
 import matplotlib.pyplot as plt
 import csv
+
+
+def self_play(engines):
+    'engines is a list of engines and engines[0] moves first'
+    board = Board()
+    index = 0
+    moves = 400
+    while (evaluate(board) is None) and (moves > 0):
+        board = engines[index].minimax(board)
+        index = int(not index)
+        moves -= 1
+        pretty_print(board)
+        print(moves)
+        print(bad)
+    return evaluate(board)
 
 
 def create_train_sequence(engines, discount):
@@ -22,13 +37,19 @@ def create_train_sequence(engines, discount):
 
     trace = []
     index = 0
-    moves = 100
+    moves = 400
     while (evaluate(board) is None) and (moves > 0):
+        pretty_print(board)
+        print(moves, "train\n")
         node = engines[index].create_search_tree(board)
         trace.append(node)
         board = node.pv.board
         index = int(not index)
         moves -= 1
+
+    pretty_print(board)
+    print("train\n")
+
     node = Node(board)
     node.reward = evaluate(board)
     trace.append(node)
