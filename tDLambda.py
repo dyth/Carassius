@@ -10,6 +10,7 @@ from chess import *
 
 import matplotlib.pyplot as plt
 import csv
+import os
 
 
 def self_play(engines):
@@ -22,7 +23,7 @@ def self_play(engines):
         index = int(not index)
         moves -= 1
     pretty_print(board)
-    print(moves)
+    print(evaluate(board), moves)
     return evaluate(board)
 
 
@@ -85,12 +86,15 @@ if __name__ == "__main__":
         learningRate = 0.01
         discount = 0.7
         directory = "tDLambda"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         valueNetwork = ValueNet(learningRate, 0.7)
         e = Engine(valueNetwork, 1, discount)
         r = Engine(random, 1, discount)
         win, lose, draw = [], [], []
         testGamesNum = 10
         count = 0
+
         while True:
             # plot first before train
             w, l, d = 0, 0, 0
@@ -128,8 +132,8 @@ if __name__ == "__main__":
             plt.pause(0.001)
             plt.clf()
 
+            torch.save(e.policy.state_dict(), f'{directory}/{count}.pt')
+            count += 1
+
             # train
             train(e, batch)
-            if (count % 100) == 99:
-                e.policy.save_weights(directory)
-            count += 1
