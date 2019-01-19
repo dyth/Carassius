@@ -17,7 +17,7 @@ def pretty_print(board):
     pieces = {'R':'♜', 'N':'♞', 'B':'♝', 'Q':'♛', 'K':'♚', 'P':'♟',
               'r':'♖', 'n':'♘', 'b':'♗', 'q':'♕', 'k':'♔', 'p':'♙'}
     # print ascii board and coordinates
-    print()
+    print('\n')
     for i, row in enumerate(board_string.split('/')):
         print(' ', 8-i, ' '.join(pieces.get(p, p) for p in row))
     print('    a b c d e f g h \n')
