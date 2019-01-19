@@ -66,6 +66,10 @@ def add_new_values(win, lose, draw, path, name):
     return win, lose, draw
 
 
+def sort_file_name(files):
+    'sort weights by number'
+    return sorted(files, key = lambda x: int(x.split('.')[0]))
+
 
 path = 'tDLambda'
 seen = set()
@@ -73,13 +77,22 @@ batch = 10
 learningRate = 0.01
 discount = 0.7
 r = Engine(random, 1, discount)
-win, lose, draw = [], [], []
+
+if os.path.isfile(f'{path}.json'):
+    with open(f'{path}.json') as f:
+        data = json.load(f)
+    win, lose, draw = data['win'], data['lose'], data['draw']
+    files = os.listdir(path)
+    for name in sort_file_name(files)[:len(win)]:
+        seen.add(name)
+else:
+    win, lose, draw = [], [], []
 
 plt.ion()
-count = 0
+count = len(win)
 while True:
     files = os.listdir(path)
-    for name in sorted(files):
+    for name in sort_file_name(files):
         if name not in seen:
             win, lose, draw = add_new_values(win, lose, draw, path, name)
             seen.add(name)
@@ -104,5 +117,4 @@ while True:
             plt.ylabel('Probability')
             plt.pause(1)
             plt.clf()
-        else:
-            time.sleep(1)
+    time.sleep(1)
