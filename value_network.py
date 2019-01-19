@@ -40,20 +40,20 @@ class ValueNet(nn.Module):
 
     def list_to_Variable(self, inputLayer, grad):
         'convert a list to Variable for use in PyTorch'
-        inputLayer = [0 if iL == None else iL for iL in inputLayer]
+        inputLayer = [0 if vector == None else vector for vector in inputLayer]
         inputLayer = torch.FloatTensor(np.array(inputLayer))
         if self.gpu:
             inputLayer = inputLayer.cuda()
         return Variable(inputLayer, requires_grad=grad)
 
 
-    def set_piece_position(self, index, vector, f, r):
+    def set_piece_position(self, i, vector, f, r):
         'set normalised file, rank, 8-rank for a piece'
-        while vector[index] != -1.0:
-            index += 2
+        while (i < 66) and (vector[i] != -1.0):
+            i += 2
             # normalise values
-            vector[index] = f / 8.0
-            vector[index+1] = r / 8.0
+        vector[i] = f / 8.0
+        vector[i+1] = r / 8.0
         return vector
 
 
@@ -66,20 +66,18 @@ class ValueNet(nn.Module):
         countSum = [2 * sum(count[:i]) for i in range(len(count))]
         index = dict(zip(pieces, countSum))
         # create input layer for network
-        iL = np.full(2*sum(count), -1.0)
+        vector = np.full(2*sum(count), -1.0)
         for f in range(8):
             for r in range(8):
                 square = board.piece_at((8*f) + r)
                 # if occupied, set places in the vector
                 if square != None:
-                    print(square.symbol(), len(iL), index[square.symbol()])
-                    iL = self.set_piece_position(index[square.symbol()], iL, f, r)
-        print(iL)
-        iL = torch.FloatTensor(np.array(iL))
-        print(iL)
+                    i = index[square.symbol()]
+                    self.set_piece_position(i, vector, f, r)
+        vector = torch.FloatTensor(np.array(vector))
         if self.gpu:
-            iL = iL.cuda()
-        return Variable(iL, requires_grad=grad)
+            vector = vector.cuda()
+        return Variable(vector, requires_grad=grad)
 
 
     def forward_pass(self, out):
@@ -145,6 +143,6 @@ class ValueNet(nn.Module):
 if __name__ == "__main__":
     from chess import *
     v = ValueNet(0.5, 0.7)
-    # v.temporal_difference([Board()], 1.0, 0.7)
-    # print(v.forward(Board())) # confirm that forward pass of chessboard works
-    v.board_to_feature_vector(Board(), 1)
+    print(v.board_to_feature_vector(Board(), 1))
+    v.temporal_difference([Board()], 1.0, 0.7)
+    print(v.forward(Board())) # confirm that forward pass of chessboard works

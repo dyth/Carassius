@@ -21,15 +21,16 @@ def self_play(engines):
         board = engines[index].minimax(board)
         index = int(not index)
         moves -= 1
-        pretty_print(board)
-        print(moves)
-        print(bad)
+    pretty_print(board)
+    print(moves)
     return evaluate(board)
 
 
 def create_train_sequence(engines, discount):
     'create a forest of nodes, their roots a new board position'
     board = Board()
+    seen_boards = set() # set of all seen boards
+    seen_boards.add(board.fen().split(' ')[0])
 
     # to explore, do a randomly chosen first move
     r = Engine(random, 1, discount)
@@ -39,16 +40,18 @@ def create_train_sequence(engines, discount):
     index = 0
     moves = 400
     while (evaluate(board) is None) and (moves > 0):
-        pretty_print(board)
-        print(moves, "train\n")
+        seen_boards.add(board.fen().split(' ')[0])
         node = engines[index].create_search_tree(board)
         trace.append(node)
+
+        if node.pv.board.fen().split(' ')[0] in seen_boards:
+            node.pv.board = r.minimax(board)
         board = node.pv.board
+
         index = int(not index)
         moves -= 1
-
     pretty_print(board)
-    print("train\n")
+    print(evaluate(board), moves, "train\n")
 
     node = Node(board)
     node.reward = evaluate(board)
