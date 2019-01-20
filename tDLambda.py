@@ -29,8 +29,8 @@ def create_train_sequence(engines, discount):
 
     trace = []
     index = 0
-    moves = 400
-    while (evaluate(board) is None) and (moves > 0):
+    moves = 0
+    while (evaluate(board) is None) and not board.is_insufficient_material():
         seen_boards.add(board.fen().split(' ')[0])
         node = engines[index].create_search_tree(board)
         trace.append(node)
@@ -40,9 +40,9 @@ def create_train_sequence(engines, discount):
         board = node.pv.board
 
         index = int(not index)
-        moves -= 1
+        moves += 1
     pretty_print(board)
-    print(games_played, 400-moves, evaluate(board))
+    print(games_played, moves, evaluate(board))
 
     node = Node(board)
     node.reward = evaluate(board)
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     batch = 20
     learningRate = 0.01
     discount = 0.7
-    directory = "tDLambda6"
+    directory = "tDLambda8"
     if not os.path.exists(directory):
         os.makedirs(directory)
     valueNetwork = ValueNet(learningRate, 0.7)

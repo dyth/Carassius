@@ -22,14 +22,22 @@ def self_play(engines):
     global games_played
     games_played += 1
     board = Board()
+    seen_boards = set()
+    seen_boards.add(board.fen().split(' ')[0])
+    r = Engine(random, 1, discount)
     index = 0
-    moves = 400
-    while (evaluate(board) is None) and (moves > 0):
+    moves = 0
+    while (evaluate(board) is None) and not board.is_insufficient_material():
         board = engines[index].minimax(board)
+
+        if board.fen().split(' ')[0] in seen_boards:
+            board = r.minimax(board)
+        seen_boards.add(board.fen().split(' ')[0])
+
         index = int(not index)
-        moves -= 1
+        moves += 1
     pretty_print(board)
-    print(games_played, evaluate(board), 400-moves)
+    print(games_played, evaluate(board), moves)
     return evaluate(board)
 
 
@@ -38,18 +46,18 @@ def evaluate_model_performance(batch, e, r):
     w, l, s, d = 0, 0, 0, 0
     for _ in range(batch):
         score = self_play([e, r])
-        if score == 1:
+        if score == -1:
             w += 1
-        elif score == -1:
+        elif score == 1:
             l += 1
         elif score == 0:
             s += 1
         else:
             d += 1
         score = self_play([r, e])
-        if score == -1:
+        if score == 1:
             w += 1
-        elif score == 1:
+        elif score == -1:
             l += 1
         elif score == 0:
             s += 1
@@ -82,7 +90,7 @@ def sort_file_name(files):
     return sorted(files, key = lambda x: int(x.split('.')[0]))
 
 
-path = 'tDLambda6'
+path = 'tDLambda8'
 seen = set()
 batch = 10
 learningRate = 0.01
