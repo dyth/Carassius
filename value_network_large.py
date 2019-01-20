@@ -5,12 +5,12 @@ Value Network based on Giraffe
 from torch.autograd import Variable
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 import numpy as np
 import torch
+import copy
+
 torch.manual_seed(1729)
 np.random.seed(1729)
-import copy
 
 
 class ValueNet(nn.Module):
@@ -90,7 +90,8 @@ class ValueNet(nn.Module):
         out = F.relu(out)
         out = self.fc3(out)
         #out = F.dropout(out, training=self.training)
-        return F.tanh(out)
+        out = torch.tanh(out)
+        return out
 
 
     def forward(self, inputLayer):
@@ -134,12 +135,11 @@ class ValueNet(nn.Module):
             for p in self.parameters():
                 grad.append(copy.deepcopy(p.grad.data))
             gradients.append(grad)
-            #print "gen", gradients[-1][0][0]
         # update the parameters of the network
         for (t, grad) in zip(traces, gradients):
             for (p, g) in zip(self.parameters(), grad):
                 p.data += self.learningRate * t * g
-            #print grad[0][0]
+
 
 
 if __name__ == "__main__":

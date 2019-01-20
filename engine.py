@@ -5,6 +5,8 @@ engine utilises a function policy to choose the best move using minimax on chess
 from chess import *
 from node import *
 
+import copy
+
 
 class Engine:
 
@@ -21,9 +23,9 @@ class Engine:
         'create search tree from board'
         node = Node(board)
         if board.turn:
-            self.minimise(node, self.searchDepth, True)
-        else:
             self.maximise(node, self.searchDepth, True)
+        else:
+            self.minimise(node, self.searchDepth, True)
         return node
 
 
@@ -34,9 +36,7 @@ class Engine:
 
     def maximise(self, node, depth, rootNode):
         'maximise policy score for players[0]'
-        # print depth
         if (depth == 0) or (node.reward is not None):
-            # print "break"
             return self.policy(node.board)
         moves = node.board.legal_moves
         score = -2.0
@@ -45,9 +45,9 @@ class Engine:
             daughter = Node(node.board)
             newScore = self.minimise(daughter, depth-1, False)
             if (newScore > score):
-                if node.pv is not None:
-                    node.other.append(node.pv)
                 score = newScore
+                if node.pv is not None:
+                    node.other.append(copy.deepcopy(node.pv))
                 node.pv = daughter
             else:
                 node.other.append(daughter)
@@ -57,9 +57,7 @@ class Engine:
 
     def minimise(self, node, depth, rootNode):
         'minimise policy score for players[1]'
-        # print depth
         if (depth == 0) or (node.reward is not None):
-            # print "break"
             return self.policy(node.board)
         moves = node.board.legal_moves
         score = 2.0
@@ -68,9 +66,9 @@ class Engine:
             daughter = Node(node.board)
             newScore = self.maximise(daughter, depth-1, False)
             if (newScore < score):
-                if node.pv is not None:
-                    node.other.append(node.pv)
                 score = newScore
+                if node.pv is not None:
+                    node.other.append(copy.deepcopy(node.pv))
                 node.pv = daughter
             else:
                 node.other.append(daughter)
@@ -79,6 +77,6 @@ class Engine:
 
 
 if __name__ == "__main__":
-    e = Engine(evaluate, 9, 0.7)
+    e = Engine(evaluate, 2, 0.7)
     tree = e.create_search_tree(Board())
     print(tree.other)

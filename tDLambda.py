@@ -7,9 +7,7 @@ from node import *
 from value_network_large import *
 from chess import *
 
-import csv
-import os
-
+import csv, os
 
 games_played = 0
 
@@ -18,35 +16,37 @@ def create_train_sequence(engines, discount):
     'create a forest of nodes, their roots a new board position'
     global games_played
     games_played += 1
-
-    board = Board()
-    seen_boards = set() # set of all seen boards
-    seen_boards.add(board.fen().split(' ')[0])
-
-    # to explore, do a randomly chosen first move
-    r = Engine(random, 1, discount)
-    board = r.minimax(board)
-
-    trace = []
     index = 0
     moves = 0
+    trace = []
+    # initialise board, set of seen boards and do random move for diversity
+    board = Board()
+    seen_boards = set({board_to_fen(board)})
+    r = Engine(random, 1, 0.7)
+    board = r.minimax(board)
+    # only quit if checkmate, stalemate or insufficent material for win
     while (evaluate(board) is None) and not board.is_insufficient_material():
-        seen_boards.add(board.fen().split(' ')[0])
+        # get new board position, if previously seen, do random move
         node = engines[index].create_search_tree(board)
-        trace.append(node)
-
-        if node.pv.board.fen().split(' ')[0] in seen_boards:
+        if board_to_fen(node.pv.board) in seen_boards:
             node.pv.board = r.minimax(board)
+        # add board to previously seen, update turn and move variables
         board = node.pv.board
-
+        seen_boards.add(board_to_fen(board))
         index = int(not index)
         moves += 1
-    pretty_print(board)
-    print(games_played, moves, evaluate(board))
-
+        trace.append(node)
+    # append final board to trace and print final game information
     node = Node(board)
     node.reward = evaluate(board)
     trace.append(node)
+    pretty_print(board)
+    print(games_played, node.reward, moves)
+    # if node.reward == -1:
+    #     for t in trace:
+    #         pretty_print(t.board)
+    #         print(t.reward)
+    #     print(bad)
     return trace
 
 
@@ -71,7 +71,8 @@ if __name__ == "__main__":
     batch = 20
     learningRate = 0.01
     discount = 0.7
-    directory = "tDLambda8"
+
+    directory = "tDLambda9"
     if not os.path.exists(directory):
         os.makedirs(directory)
     valueNetwork = ValueNet(learningRate, 0.7)
