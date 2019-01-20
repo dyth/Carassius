@@ -26,12 +26,9 @@ class ValueNet(nn.Module):
         self.decay = decay
 
         # three layers
-        # self.fc1 = nn.Linear(68, 128)
-        # self.fc2 = nn.Linear(128, 32)
-        # self.fc3= nn.Linear(32, 1)
-
-        self.fc1 = nn.Linear(68, 32)
-        self.fc2 = nn.Linear(32, 1)
+        self.fc1 = nn.Linear(384, 256)
+        self.fc2 = nn.Linear(256, 64)
+        self.fc3= nn.Linear(64, 1)
 
         # if cuda, use GPU
         self.gpu = torch.cuda.is_available()
@@ -52,11 +49,13 @@ class ValueNet(nn.Module):
 
     def set_piece_position(self, i, vector, f, r):
         'set normalised file, rank, 8-rank for a piece'
-        while (i < 66) and (vector[i] != -1.0):
-            i += 2
+        while vector[i+3] != 0.0:
+            i += 4
             # normalise values
         vector[i] = f / 8.0
         vector[i+1] = r / 8.0
+        vector[i+2] = (8-f) / 8.0
+        vector[i+3] = (8-r) / 8.0
         return vector
 
 
@@ -65,11 +64,11 @@ class ValueNet(nn.Module):
         # create {piece -> vectorposition} dictionary
         # {white, black} 8*Pawn, 10*Knight, 10*Bishop, 10*Rook, 9*Queen, 1*King
         pieces = ['p', 'n', 'b', 'r', 'q', 'k', 'P', 'N', 'B', 'R', 'Q', 'K']
-        count = [8, 2, 2, 2, 2, 1, 8, 2, 2, 2, 2, 1]
-        countSum = [2 * sum(count[:i]) for i in range(len(count))]
+        count = [8, 10, 10, 10, 9, 1, 8, 10, 10, 10, 9, 1]
+        countSum = [4 * sum(count[:i]) for i in range(len(count))]
         index = dict(zip(pieces, countSum))
         # create input layer for network
-        vector = np.full(2*sum(count), -1.0)
+        vector = np.zeros(4*sum(count))#, -1.0)
         for f in range(8):
             for r in range(8):
                 square = board.piece_at((8*f) + r)
@@ -88,8 +87,8 @@ class ValueNet(nn.Module):
         out = self.fc1(out)
         out = F.relu(out)
         out = self.fc2(out)
-        # out = F.relu(out)
-        # out = self.fc3(out)
+        out = F.relu(out)
+        out = self.fc3(out)
         #out = F.dropout(out, training=self.training)
         return F.tanh(out)
 

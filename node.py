@@ -27,9 +27,9 @@ def evaluate(board):
     'if checkmate, return 1 or -1'
     if board.is_checkmate():
         if board.turn:
-            return 1
-        else:
             return -1
+        else:
+            return 1
     elif board.is_stalemate():
         return 0
 

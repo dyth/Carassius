@@ -4,7 +4,7 @@ train value_network using the TD(lambda) reinforcement algorithm
 """
 from engine import *
 from node import *
-from value_network import *
+from value_network_large import *
 from chess import *
 
 import csv
@@ -71,7 +71,7 @@ if __name__ == "__main__":
     batch = 20
     learningRate = 0.01
     discount = 0.7
-    directory = "tDLambda"
+    directory = "tDLambda5"
     if not os.path.exists(directory):
         os.makedirs(directory)
     valueNetwork = ValueNet(learningRate, 0.7)
