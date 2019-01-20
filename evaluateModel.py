@@ -82,7 +82,7 @@ def sort_file_name(files):
     return sorted(files, key = lambda x: int(x.split('.')[0]))
 
 
-path = 'tDLambda5'
+path = 'tDLambda6'
 seen = set()
 batch = 10
 learningRate = 0.01
@@ -111,7 +111,7 @@ while True:
             )
             seen.add(name)
             count += 1
-            games = range(0, batch*count, batch)
+            games = range(0, 2*batch*count, 2*batch)
 
             graph_data = {
                 'games': list(games),

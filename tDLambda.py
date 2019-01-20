@@ -71,7 +71,7 @@ if __name__ == "__main__":
     batch = 20
     learningRate = 0.01
     discount = 0.7
-    directory = "tDLambda5"
+    directory = "tDLambda6"
     if not os.path.exists(directory):
         os.makedirs(directory)
     valueNetwork = ValueNet(learningRate, 0.7)
