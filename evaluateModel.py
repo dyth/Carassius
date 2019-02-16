@@ -22,7 +22,7 @@ def self_play(engines):
     # initialise board and set of seen boards
     board = Board()
     seenBoards = set({board_to_fen(board)})
-    r = Engine(random, 1, 0.7)
+    r = Engine(random, 1, 0.99)
     # only quit if checkmate, stalemate or insufficent material for win
     while (evaluate(board) is None) and not board.is_insufficient_material():
         # get new board position, if previously seen, do random move
@@ -72,8 +72,8 @@ def evaluate_model_performance(batch, e, r):
 def add_new_values(win, lose, stalemate, draw, filename):
     'find % win, lose and draw and add to history list'
     batch = 10
-    discount = 0.7
-    valueNetwork = ValueNet(0.01, 0.7)
+    discount = 0.99
+    valueNetwork = ValueNet(0.01, 0.99)
     valueNetwork.load_state_dict(torch.load(filename))
     valueNetwork.eval()
     e = Engine(valueNetwork, 1, discount)
@@ -94,7 +94,7 @@ def sort_file_name(files):
 
 
 
-path = 'tDLambda8'
+path = 'tDLambda15'
 seen = set()
 
 # if .json exists, load history
@@ -114,6 +114,7 @@ else:
 
 plt.ion()
 count = len(win)
+batch = 10
 while True:
     files = os.listdir(path)
     for name in sort_file_name(files):
@@ -124,7 +125,7 @@ while True:
                 win, lose, stalemate, draw, filename
             )
             count += 1
-            games = range(0, 2*batch*count, 2*batch)
+            games = range(20, 20 + 2*batch*count, 2*batch)
             # save .json
             graph_data = {
                 'games': list(games),

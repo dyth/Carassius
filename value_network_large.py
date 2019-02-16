@@ -38,15 +38,6 @@ class ValueNet(nn.Module):
                 torch.backends.cudnn.benchmark = True
 
 
-    def list_to_Variable(self, inputLayer, grad):
-        'convert a list to Variable for use in PyTorch'
-        inputLayer = [0 if vector == None else vector for vector in inputLayer]
-        inputLayer = torch.FloatTensor(np.array(inputLayer))
-        if self.gpu:
-            inputLayer = inputLayer.cuda()
-        return Variable(inputLayer, requires_grad=grad)
-
-
     def set_piece_position(self, i, vector, f, r):
         'set normalised file, rank, 8-rank for a piece'
         while vector[i+3] != 0.0:
@@ -85,12 +76,11 @@ class ValueNet(nn.Module):
     def forward_pass(self, out):
         'forward pass using Variable inputLayer'
         out = self.fc1(out)
-        out = F.relu(out)
+        out = F.elu(out)
         out = self.fc2(out)
-        out = F.relu(out)
+        out = F.elu(out)
         out = self.fc3(out)
-        #out = F.dropout(out, training=self.training)
-        out = torch.tanh(out)
+        out = F.tanh(out)
         return out
 
 
@@ -100,51 +90,43 @@ class ValueNet(nn.Module):
         return self.forward_pass(inputLayer).data[0]
 
 
-    def load_weights(self):
-        'load name'
-        self.load_state_dict(torch.load("weights.h5"))
-
-
-    def save_weights(self, directory):
-        'save the weights as the number in "directory/"'
-        self.weightsNum += 1
-        name = directory + "/" +  str(self.weightsNum) + ".h5"
-        print(name)
-        torch.save(self.state_dict(), name)
-
-
     def temporal_difference(self, boards, lastValue, discount):
         'backup values according to boards'
         traces, gradients, trace = [], [], 0.0
         # boards goes forward in time, so reverse index
         for i in range(len(boards)-1, -1, -1):
-            #board = self.list_to_Variable(boards[i], True)
             board = self.board_to_feature_vector(boards[i], True)
             value = self.forward_pass(board)
             # compute eligibility trace
-            difference = discount * lastValue - value.data[0]
-            trace = trace * discount * self.decay + difference
+            difference = discount*lastValue - float(value.data)
+            trace = trace*self.decay + difference # trace*discount*self.decay
             traces.append(trace)
-            # zero gradients and compute partial differential wrt parameters
+            # zero gradients
             for p in self.parameters():
                 if p.grad is not None:
                     p.grad.data.zero_()
-            lastValue = value.data[0]
+            # compute partial differential wrt parameters
+            lastValue = float(value.data)
             value.backward()
-            grad = []
-            for p in self.parameters():
-                grad.append(copy.deepcopy(p.grad.data))
+            grad = [copy.deepcopy(p.grad.data) for p in self.parameters()]
             gradients.append(grad)
+            del grad, value, board
         # update the parameters of the network
         for (t, grad) in zip(traces, gradients):
             for (p, g) in zip(self.parameters(), grad):
                 p.data += self.learningRate * t * g
-
+        del traces, gradients, trace, grad, boards, lastValue
+        torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
     from chess import *
     v = ValueNet(0.5, 0.7)
-    print(v.board_to_feature_vector(Board(), 1))
+    # print(v.board_to_feature_vector(Board(), 1))
+    print(v.forward(Board()))
     v.temporal_difference([Board()], 1.0, 0.7)
     print(v.forward(Board())) # confirm that forward pass of chessboard works
+    v.temporal_difference([Board()], 1.0, 0.7)
+    print(v.forward(Board()))
+    v.temporal_difference([Board()], 1.0, 0.7)
+    print(v.forward(Board()))
