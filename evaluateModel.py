@@ -94,7 +94,7 @@ def sort_file_name(files):
 
 
 
-path = 'tDLambda16'
+path = 'tDLambda17'
 seen = set()
 
 # if .json exists, load history

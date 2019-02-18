@@ -57,8 +57,10 @@ def TD_Lambda(engines, network, discount):
     boards = [t.board for t in trace]
     reward = trace[-1].reward
     if reward is None:
-        reward = network(boards[-1])
-        boards = boards[:-1]
+        reward = 0.0#network(boards[-1])
+        #boards = boards[:-1]
+    else:
+        reward *= 0.999**len(boards)
     network.temporal_difference(boards, reward, discount)
     del boards
 
@@ -80,7 +82,7 @@ if __name__ == "__main__":
     learningRate = 0.01
     discount = 0.999
 
-    directory = "tDLambda16"
+    directory = "tDLambda17"
     if not os.path.exists(directory):
         os.makedirs(directory)
         valueNetwork = ValueNet(learningRate, 0.7)
