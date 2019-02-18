@@ -72,8 +72,8 @@ def evaluate_model_performance(batch, e, r):
 def add_new_values(win, lose, stalemate, draw, filename):
     'find % win, lose and draw and add to history list'
     batch = 10
-    discount = 0.99
-    valueNetwork = ValueNet(0.01, 0.99)
+    discount = 0.999
+    valueNetwork = ValueNet(0.01, 0.7)
     valueNetwork.load_state_dict(torch.load(filename))
     valueNetwork.eval()
     e = Engine(valueNetwork, 1, discount)
@@ -94,7 +94,7 @@ def sort_file_name(files):
 
 
 
-path = 'tDLambda15'
+path = 'tDLambda16'
 seen = set()
 
 # if .json exists, load history

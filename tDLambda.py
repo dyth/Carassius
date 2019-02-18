@@ -22,11 +22,11 @@ def create_train_sequence(engines, discount):
     # initialise board, set of seen boards and do random move for diversity
     board = Board()
     seen_boards = set({board_to_fen(board)})
-    r = Engine(random, 1, 0.99)
+    r = Engine(random, 1, 0.999)
     board = r.minimax(board)
     board = r.minimax(board)
     # only quit if checkmate, stalemate or insufficent material for win
-    while (evaluate(board) is None) and not board.is_insufficient_material():
+    while (evaluate(board) is None) and (not board.is_insufficient_material()) and (moves < 2000):
         # get new board position, if previously seen, do random move
         node = engines[index].create_search_tree(board)
         if board_to_fen(node.pv.board) in seen_boards:
@@ -59,10 +59,6 @@ def TD_Lambda(engines, network, discount):
     if reward is None:
         reward = network(boards[-1])
         boards = boards[:-1]
-    # elif reward == 1:
-    #     reward -= 0.001* len(boards)
-    # elif reward == -1:
-    #     reward += 0.001* len(boards)
     network.temporal_difference(boards, reward, discount)
     del boards
 
@@ -82,17 +78,17 @@ def sort_file_name(files):
 if __name__ == "__main__":
     batch = 20
     learningRate = 0.01
-    discount = 0.7
+    discount = 0.999
 
-    directory = "tDLambda15"
+    directory = "tDLambda16"
     if not os.path.exists(directory):
         os.makedirs(directory)
-        valueNetwork = ValueNet(learningRate, 0.99)
+        valueNetwork = ValueNet(learningRate, 0.7)
         count = 0
     else:
         files = os.listdir(directory)
         filename = sort_file_name(files)[-1]
-        valueNetwork = ValueNet(learningRate, 0.99)
+        valueNetwork = ValueNet(learningRate, 0.7)
         valueNetwork.load_state_dict(torch.load(f'{directory}/{filename}'))
         count = len(files)-1
 
