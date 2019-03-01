@@ -26,7 +26,7 @@ def create_train_sequence(engines, discount):
     board = r.minimax(board)
     board = r.minimax(board)
     # only quit if checkmate, stalemate or insufficent material for win
-    while (evaluate(board) is None) and (not board.is_insufficient_material()) and (moves < 2000):
+    while (evaluate(board) is None) and (not board.is_insufficient_material()) and (moves < 1000):
         # get new board position, if previously seen, do random move
         node = engines[index].create_search_tree(board)
         if board_to_fen(node.pv.board) in seen_boards:
@@ -59,8 +59,10 @@ def TD_Lambda(engines, network, discount):
     if reward is None:
         reward = 0.0#network(boards[-1])
         #boards = boards[:-1]
-    else:
-        reward *= 0.999**len(boards)
+    elif reward == 1:
+        reward -= 0.9 * len(boards) / 1000.0
+    elif reward == -1:
+        reward += 0.9 * len(boards) / 1000.0
     network.temporal_difference(boards, reward, discount)
     del boards
 
@@ -82,7 +84,7 @@ if __name__ == "__main__":
     learningRate = 0.01
     discount = 0.999
 
-    directory = "tDLambda17"
+    directory = "tDLambda18"
     if not os.path.exists(directory):
         os.makedirs(directory)
         valueNetwork = ValueNet(learningRate, 0.7)
