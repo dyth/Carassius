@@ -4,7 +4,7 @@ train value_network using the TD(lambda) reinforcement algorithm
 """
 from engine import *
 from node import *
-from value_network_large import *
+from bitboard_network import *
 from chess import *
 
 import csv, os
@@ -59,10 +59,11 @@ def TD_Lambda(engines, network, discount):
     if reward is None:
         reward = 0.0#network(boards[-1])
         #boards = boards[:-1]
-    elif reward == 1:
-        reward -= 0.9 * len(boards) / 1000.0
-    elif reward == -1:
-        reward += 0.9 * len(boards) / 1000.0
+    # elif reward == 1:
+    #     reward -= 0.9 * len(boards) / 1000.0
+    # elif reward == -1:
+    #     reward += 0.9 * len(boards) / 1000.0
+    reward *= 0.999**len(boards)
     network.temporal_difference(boards, reward, discount)
     del boards
 
@@ -81,10 +82,10 @@ def sort_file_name(files):
 
 if __name__ == "__main__":
     batch = 20
-    learningRate = 0.01
+    learningRate = 0.05
     discount = 0.999
 
-    directory = "tDLambda18"
+    directory = "tDLambda20"
     if not os.path.exists(directory):
         os.makedirs(directory)
         valueNetwork = ValueNet(learningRate, 0.7)

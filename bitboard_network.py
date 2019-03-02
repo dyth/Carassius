@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Value Network based on Giraffe
+Value Network based on AlphaZero
 """
 from torch.autograd import Variable
 import torch.nn as nn
@@ -66,7 +66,7 @@ class ValueNet(nn.Module):
         out = self.fc2(out)
         out = F.elu(out)
         out = self.fc3(out)
-        out = F.tanh(out)
+        out = torch.tanh(out)
         return out
 
 
