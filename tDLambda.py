@@ -59,11 +59,11 @@ def TD_Lambda(engines, network, discount):
     if reward is None:
         reward = 0.0#network(boards[-1])
         #boards = boards[:-1]
-    elif reward == 1:
-        reward -= 0.9 * len(boards) / 500.0
-    elif reward == -1:
-        reward += 0.9 * len(boards) / 500.0
-    # reward *= 0.999**len(boards)
+    # elif reward == 1:
+    #     reward -= 0.9 * len(boards) / 500.0
+    # elif reward == -1:
+    #     reward += 0.9 * len(boards) / 500.0
+    reward *= 0.995**len(boards)
     network.temporal_difference(boards, reward, discount)
     del boards
 
@@ -82,10 +82,10 @@ def sort_file_name(files):
 
 if __name__ == "__main__":
     batch = 20
-    learningRate = 0.05
+    learningRate = 0.01
     discount = 0.999
 
-    directory = "tDLambda2"
+    directory = "tDLambda3"
     if not os.path.exists(directory):
         os.makedirs(directory)
         valueNetwork = ValueNet(learningRate, 0.7)
