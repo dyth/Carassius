@@ -11,7 +11,8 @@ import matplotlib.pyplot as plt
 import csv, os, time, json
 
 games_played = 0
-
+plys = 200
+path = 'tDLambda8'
 
 def self_play(engines):
     'engines is a list of engines and engines[0] moves first'
@@ -24,7 +25,7 @@ def self_play(engines):
     seenBoards = set({board_to_fen(board)})
     r = Engine(random, 1, 0.99)
     # only quit if checkmate, stalemate or insufficent material for win
-    while (evaluate(board) is None) and (not board.is_insufficient_material()) and (moves < 100):
+    while (evaluate(board) is None) and (not board.is_insufficient_material()) and (moves < plys):
         # get new board position, if previously seen, do random move
         newBoard = engines[index].minimax(board)
         if board_to_fen(newBoard) in seenBoards:
@@ -94,7 +95,7 @@ def sort_file_name(files):
 
 
 
-path = 'tDLambda5'
+
 seen = set()
 
 # if .json exists, load history

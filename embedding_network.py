@@ -41,21 +41,21 @@ class ValueNet(nn.Module):
         self.decay = decay
 
         # self.embedding = nn.Embedding(13, 16, padding_idx=0)
-        self.embedding = ImageBOWEmbedding(13, 8)
+        self.embedding = ImageBOWEmbedding(13, 4)
         self.value = nn.Sequential(
-            nn.Conv2d(8, 16, 3, 1, padding=1),
+            nn.Conv2d(4, 8, 3, 1, padding=1),
+            nn.GroupNorm(1, 8),
+            nn.ReLU(),
+            nn.Conv2d(8, 16, 3, 2),
             nn.GroupNorm(1, 16),
             nn.ReLU(),
-            nn.Conv2d(16, 32, 3, 2),
+            nn.Conv2d(16, 32, 3, 1, padding=1),
             nn.GroupNorm(1, 32),
             nn.ReLU(),
-            nn.Conv2d(32, 64, 3, 1, padding=1),
+            nn.Conv2d(32, 64, 3, 2),
             nn.GroupNorm(1, 64),
             nn.ReLU(),
-            nn.Conv2d(64, 128, 3, 2),
-            nn.GroupNorm(1, 128),
-            nn.ReLU(),
-            nn.Conv2d(128, 1, 1, 1)
+            nn.Conv2d(64, 1, 1, 1)
         )
 
         # if cuda, use GPU

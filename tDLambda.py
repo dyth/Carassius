@@ -1,4 +1,4 @@
-plys#!/usr/bin/env python
+#!/usr/bin/env python
 """
 train value_network using the TD(lambda) reinforcement algorithm
 """
@@ -10,7 +10,9 @@ from chess import *
 import csv, os
 
 games_played = 0
-plys = 100
+plys = 200
+directory = "tDLambda8"
+
 
 def create_train_sequence(engines, discount):
     'create a forest of nodes, their roots a new board position'
@@ -57,8 +59,9 @@ def TD_Lambda(engines, network, discount):
     boards = [t.board for t in trace]
     reward = trace[-1].reward
     if reward is None:
-        reward = 0.0#network(boards[-1])
-        #boards = boards[:-1]
+        # reward = 0.0
+        reward = network(boards[-1])
+        boards = boards[:-1]
     elif reward == 1:
         reward -= 0.9 * len(boards) / float(plys)
     elif reward == -1:
@@ -85,7 +88,6 @@ if __name__ == "__main__":
     learningRate = 0.01
     discount = 0.999
 
-    directory = "tDLambda5"
     if not os.path.exists(directory):
         os.makedirs(directory)
         valueNetwork = ValueNet(learningRate, 0.7)
